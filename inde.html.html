@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر الجوكر | منصة احترافية لبيع الملابس عبر الإنترنت</title>
+    <!-- تحميل Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- إعداد Tailwind للألوان والخطوط المخصصة -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class', // تفعيل الوضع المظلم عبر إضافة الكلاس 'dark'
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#1f2937', // رمادي داكن (فحمي)
+                        'primary-indigo': '#4f46e5', // نيلي عميق
+                        'light-bg': '#f9fafb', // رمادي فاتح جداً
+                        'gemini-blue': '#16b8ff', // لون خاص بميزة الذكاء الاصطناعي
+                        'admin-red': '#ef4444', // أحمر للإدارة
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* أنماط مخصصة لمظهر احترافي ونظيف */
+        .product-card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 4, 15, 0.05);
+        }
+        body {
+            direction: rtl;
+            text-align: right;
+        }
+        /* لعكس اتجاه العناصر التي يجب أن تكون من اليسار لليمين حتى في وضع RTL */
+        .flex-row-reverse-on-rtl {
+            direction: ltr; 
+        }
+        .flex-row-reverse-on-rtl > * {
+            direction: rtl;
+        }
+        .gemini-feature-btn {
+            background: linear-gradient(135deg, #16b8ff, #4f46e5);
+            transition: all 0.3s ease;
+        }
+        .gemini-feature-btn:hover {
+            box-shadow: 0 4px 15px rgba(22, 184, 255, 0.4);
+            transform: scale(1.05);
+        }
+        .admin-btn {
+            background: #ef4444;
+            transition: all 0.3s ease;
+        }
+        .admin-btn:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-light-bg dark:bg-gray-900 text-primary-dark dark:text-gray-100 font-sans transition-colors duration-300">
+
+    <!-- حاوية رسائل التنبيه/السلة العالمية -->
+    <div id="alert-container" class="fixed top-4 left-4 z-50 space-y-2">
+    </div>
+
+    <!-- الرأس والقائمة الملاحية (Header & Navigation) -->
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- الشعار -->
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-3xl font-extrabold text-primary-indigo tracking-tight">
+                        El Jokar
+                    </a>
+                </div>
+
+                <!-- روابط القائمة لسطح المكتب -->
+                <nav class="hidden md:flex space-x-8" style="direction: rtl;">
+                    <a href="#new-arrivals" class="text-lg font-medium text-gray-600 dark:text-gray-300 hover:text-primary-indigo transition duration-150">المنتجات</a>
+                    <a href="#categories" class="text-lg font-medium text-gray-600 dark:text-gray-300 hover:text-primary-indigo transition duration-150">الفئات</a>
+                    <button onclick="document.getElementById('faq-modal').classList.remove('hidden')" class="text-lg font-medium text-gray-600 dark:text-gray-300 hover:text-primary-indigo transition duration-150">
+                        <span class="ml-1">🗣️</span> مولد الأسئلة الشائعة
+                    </button>
+                    <a href="#contact" class="text-lg font-medium text-gray-600 dark:text-gray-300 hover:text-primary-indigo transition duration-150">اتصل بنا</a>
+                </nav>
+
+                <!-- الأيقونات وزر القائمة المتنقلة ووضع الظلام -->
+                <div class="flex items-center space-x-4">
+                    <!-- يتم عرض الـ ID الخاص بالمستخدم الحالي لمساعدته في تحديد هويته -->
+                    <span id="user-status" class="text-xs text-gray-500 dark:text-gray-400">جاري التحميل...</span> 
+
+                    <!-- تبديل الوضع المظلم -->
+                    <div class="relative inline-block w-14 align-middle select-none transition duration-200 ease-in mr-2">
+                        <input type="checkbox" id="dark-mode-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-gray-900 border-4 appearance-none cursor-pointer transform translate-x-0 dark:translate-x-full transition duration-300 ease-in-out">
+                        <label for="dark-mode-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-indigo-600 cursor-pointer"></label>
+                    </div>
+
+                    <!-- أيقونة السلة (مفعلة الآن) -->
+                    <button onclick="window.showCartModal()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 relative">
+                        <!-- أيقونة حقيبة التسوق (SVG) -->
+                        <svg class="w-6 h-6 text-primary-dark dark:text-gray-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        <span id="cart-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
+                    </button>
+
+                    <!-- زر القائمة المتنقلة -->
+                    <button id="mobile-menu-button" type="button" class="md:hidden p-2 rounded-md text-gray-500 hover:text-primary-indigo hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">فتح القائمة الرئيسية</span>
+                        <svg id="menu-icon-open" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="menu-icon-close" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- القائمة المتنقلة -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-100 dark:border-gray-700">
+                <a href="#new-arrivals" class="block px-3 py-2 rounded-md text-base font-medium text-primary-dark dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary-indigo transition duration-150">المنتجات</a>
+                <a href="#categories" class="block px-3 py-2 rounded-md text-base font-medium text-primary-dark dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary-indigo transition duration-150">الفئات</a>
+                <button onclick="document.getElementById('faq-modal').classList.remove('hidden')" class="block w-full text-right px-3 py-2 rounded-md text-base font-medium text-primary-dark dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary-indigo transition duration-150">
+                    <span class="ml-1">🗣️</span> مولد الأسئلة الشائعة
+                </button>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-primary-dark dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary-indigo transition duration-150">اتصل بنا</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto">
+
+        <!-- 1. قسم البطل (Hero Section) -->
+        <section class="relative bg-primary-indigo bg-opacity-90 pt-20 pb-28 md:pt-32 md:pb-40 rounded-b-lg shadow-2xl overflow-hidden mb-12">
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle, #6366f1 1px, transparent 1px);"></div>
+            <div class="relative z-10 text-center px-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-4">
+                    أناقة خالدة، راحة عصرية.
+                </h1>
+                <p class="text-xl md:text-2xl text-indigo-100 mb-8 max-w-3xl mx-auto">
+                    اكتشف أحدث مجموعة من الملابس المصممة بعناية، لكل مناسبة.
+                </p>
+                <a href="#new-arrivals" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-lg font-bold rounded-full shadow-lg text-primary-indigo bg-white hover:bg-indigo-50 transition duration-300 transform hover:scale-105">
+                    تسوق المجموعة
+                </a>
+            </div>
+        </section>
+
+        <!-- 2. قسم الفئات المميزة (بدون تغيير) -->
+        <section id="categories" class="py-12 px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center mb-10 text-primary-dark dark:text-gray-100">تسوق حسب الفئة</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- بطاقات الفئة (تبقى ثابتة كمثال) -->
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-center product-card-hover">
+                    <img src="https://placehold.co/400x300/a5b4fc/ffffff?text=بلايز" onerror="this.onerror=null;this.src='https://placehold.co/400x300/a5b4fc/ffffff?text=بلايز';" alt="فئة البلايز" class="rounded-lg mb-4 w-full object-cover h-48">
+                    <h3 class="text-xl font-semibold mb-2 text-primary-dark dark:text-gray-100">بلايز أساسية</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">قمصان، تيشيرتات، وملابس صوفية خفيفة.</p>
+                    <a href="#" class="text-primary-indigo font-medium hover:text-indigo-700 transition duration-150 flex-row-reverse-on-rtl">استكشف &rarr;</a>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-center product-card-hover">
+                    <img src="https://placehold.co/400x300/60a5fa/ffffff?text=بناطيل" onerror="this.onerror=null;this.src='https://placehold.co/400x300/60a5fa/ffffff?text=بناطيل';" alt="فئة البناطيل" class="rounded-lg mb-4 w-full object-cover h-48">
+                    <h3 class="text-xl font-semibold mb-2 text-primary-dark dark:text-gray-100">بناطيل فاخرة</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">سراويل، جينز، وتنانير.</p>
+                    <a href="#" class="text-primary-indigo font-medium hover:text-indigo-700 transition duration-150 flex-row-reverse-on-rtl">استكشف &rarr;</a>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-center product-card-hover">
+                    <img src="https://placehold.co/400x300/34d399/ffffff?text=ملابس+خارجية" onerror="this.onerror=null;this.src='https://placehold.co/400x300/34d399/ffffff?text=ملابس+خارجية';" alt="فئة الملابس الخارجية" class="rounded-lg mb-4 w-full object-cover h-48">
+                    <h3 class="text-xl font-semibold mb-2 text-primary-dark dark:text-gray-100">ملابس خارجية مميزة</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">سترات، معاطف، و بليزرات.</p>
+                    <a href="#" class="text-primary-indigo font-medium hover:text-indigo-700 transition duration-150 flex-row-reverse-on-rtl">استكشف &rarr;</a>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 text-center product-card-hover">
+                    <img src="https://placehold.co/400x300/fcd34d/ffffff?text=إكسسوارات" onerror="this.onerror=null;this.src='https://placehold.co/400x300/fcd34d/ffffff?text=إكسسوارات';" alt="فئة الإكسسوارات" class="rounded-lg mb-4 w-full object-cover h-48">
+                    <h3 class="text-xl font-semibold mb-2 text-primary-dark dark:text-gray-100">إكسسوارات راقية</h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">حقائب، أوشحة، وقبعات.</p>
+                    <a href="#" class="text-primary-indigo font-medium hover:text-indigo-700 transition duration-150 flex-row-reverse-on-rtl">استكشف &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. الوافدون الجدد/شبكة المنتجات (قسم "المنتجات") -->
+        <section id="new-arrivals" class="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 rounded-xl shadow-inner my-12 transition-colors duration-300">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 space-y-4 md:space-y-0">
+                <h2 class="text-4xl font-bold text-primary-dark dark:text-gray-100">المنتجات المميزة</h2>
+                <div class="flex space-x-4 space-x-reverse">
+                    <!-- زر لوحة إدارة المنتجات - مخفي افتراضياً، سيظهر فقط للمدير (Admin) -->
+                    <button id="admin-button" onclick="document.getElementById('admin-modal').classList.remove('hidden')" class="admin-btn text-white px-6 py-3 rounded-full font-bold shadow-lg flex items-center justify-center hidden">
+                        <span class="ml-2">🛠️</span> لوحة إدارة المنتجات
+                    </button>
+                    <!-- زر مُحسّن الوصف (Gemini) -->
+                    <button onclick="document.getElementById('ai-modal-desc').classList.remove('hidden')" class="gemini-feature-btn text-white px-6 py-3 rounded-full font-bold shadow-lg flex items-center justify-center">
+                        ✨ مُحسّن وصف المنتج
+                    </button>
+                </div>
+            </div>
+
+            <!-- عرض المنتجات - سيتم ملؤه ديناميكياً من Firestore -->
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- المنتجات ستظهر هنا بعد تحميلها من Firestore -->
+                <p id="loading-products" class="col-span-full text-center text-gray-500 dark:text-gray-400">جاري تحميل المنتجات...</p>
+            </div>
+            
+            <!-- زر عرض الكل -->
+            <div class="text-center mt-12">
+                <a href="#" class="inline-flex items-center justify-center px-6 py-3 border-2 border-primary-indigo text-lg font-bold rounded-full text-primary-indigo hover:bg-primary-indigo hover:text-white transition duration-300">
+                    عرض جميع المنتجات
+                </a>
+            </div>
+        </section>
+        
+        <!-- 4. لافتة ضمان الجودة (بدون تغيير) -->
+        <section class="py-10 px-4 sm:px-6 lg:px-8 my-12 bg-primary-dark dark:bg-gray-700 rounded-xl shadow-2xl transition-colors duration-300">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center text-white">
+                <div class="p-4">
+                    <div class="text-3xl mb-2">⭐</div>
+                    <h4 class="text-xl font-semibold mb-1">جودة متميزة</h4>
+                    <p class="text-gray-300">مواد مختارة بعناية لضمان الراحة وطول العمر.</p>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl mb-2">📦</div>
+                    <h4 class="text-xl font-semibold mb-1">شحن سريع</h4>
+                    <p class="text-gray-300">توصيل موثوق به ومتعقب لجميع أنحاء العالم.</p>
+                </div>
+                <div class="p-4">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h4 class="text-xl font-semibold mb-1">دفع آمن</h4>
+                    <p class="text-gray-300">خصوصيتك وأمانك هما أولويتنا القصوى.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- التذييل (Footer) (بدون تغيير) -->
+    <footer class="bg-primary-dark dark:bg-gray-800 mt-12 py-12 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 border-b border-gray-700 pb-8 mb-8">
+                <div class="col-span-2 md:col-span-1">
+                    <h3 class="text-2xl font-bold text-white mb-3">متجر أحمد</h3>
+                    <p class="text-gray-400 text-sm">ارتقِ بخزانة ملابسك، قطعة واحدة في كل مرة.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-3">التسوق</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-primary-indigo transition">المنتجات</a></li>
+                        <li><a href="#" class="hover:text-primary-indigo transition">تخفيضات</a></li>
+                        <li><a href="#" class="hover:text-primary-indigo transition">بطاقات الهدايا</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-white mb-3">خدمة العملاء</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-primary-indigo transition">الإرجاع والاستبدال</a></li>
+                        <li><a href="#" class="hover:text-primary-indigo transition">معلومات الشحن</a></li>
+                        <li><a href="#" class="hover:text-primary-indigo transition">الأسئلة الشائعة</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-2 md:col-span-2">
+                    <h4 class="text-lg font-semibold text-white mb-3" id="contact">اشترك في نشرتنا البريدية</h4>
+                    <form class="flex space-x-2" style="direction: ltr;">
+                        <input type="email" placeholder="أدخل بريدك الإلكتروني" class="flex-grow p-3 rounded-lg border-none focus:ring-2 focus:ring-primary-indigo text-primary-dark" required>
+                        <button type="submit" class="bg-primary-indigo text-white px-5 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">اشترك</button>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center text-gray-500 text-sm">
+                &copy; 2025 متجر أحمد. جميع الحقوق محفوظة.
+            </div>
+        </div>
+    </footer>
+    
+    <!-- ********* نافذة سلة التسوق (Cart Modal) ********* -->
+    <div id="cart-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-xl w-full flex flex-col transition-colors duration-300" style="max-height: 90vh;">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-primary-indigo flex items-center">
+                    🛒 سلة التسوق
+                </h3>
+                <button onclick="document.getElementById('cart-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div id="cart-items-list" class="flex-grow overflow-y-auto p-6 space-y-4">
+                <!-- عناصر السلة ستظهر هنا ديناميكياً -->
+                <p id="empty-cart-message" class="text-center text-gray-500 dark:text-gray-400">سلتك فارغة حاليًا. ابدأ التسوق!</p>
+            </div>
+
+            <div class="p-6 border-t border-gray-100 dark:border-gray-700">
+                <div class="flex justify-between items-center mb-4 text-xl font-bold">
+                    <span class="text-primary-dark dark:text-gray-100">الإجمالي:</span>
+                    <span id="cart-total" class="flex-row-reverse-on-rtl text-primary-indigo">$0.00</span>
+                </div>
+                <button onclick="window.showCustomAlert('هذه الخطوة تتطلب بوابة دفع حقيقية. تم إكمال جزء السلة بنجاح!', 'info')" class="bg-green-500 text-white px-5 py-3 rounded-lg font-bold w-full hover:bg-green-600 transition duration-300 shadow-lg">
+                    إنهاء الشراء والدفع
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ********* نافذة لوحة إدارة المنتجات (Admin Modal) - مخفية افتراضياً ********* -->
+    <div id="admin-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden transition-colors duration-300">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-admin-red">
+                <h3 class="text-2xl font-bold text-white flex items-center">
+                    <span class="ml-2">🛠️</span> لوحة إدارة المنتجات
+                </h3>
+                <button onclick="document.getElementById('admin-modal').classList.add('hidden')" class="text-white hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="add-product-form" class="p-6 space-y-4">
+                <div>
+                    <label for="product-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">اسم المنتج</label>
+                    <input type="text" id="product-name" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-primary-indigo focus:border-primary-indigo">
+                </div>
+                <div>
+                    <label for="product-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">السعر ($)</label>
+                    <input type="number" step="0.01" id="product-price" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-primary-indigo focus:border-primary-indigo">
+                </div>
+                <div>
+                    <label for="product-desc" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الوصف</label>
+                    <textarea id="product-desc" rows="3" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-primary-indigo focus:border-primary-indigo"></textarea>
+                </div>
+                <div>
+                    <label for="product-image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">رابط صورة المنتج (URL)</label>
+                    <input type="url" id="product-image" value="https://placehold.co/600x800/e0e7ff/374151?text=منتج+جديد" required class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-primary-indigo focus:border-primary-indigo">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">نصيحة: استخدم رابط صورة حقيقي أو استخدم رابط Placeholder أعلاه.</p>
+                </div>
+
+                <button type="submit" id="submit-product-btn" class="admin-btn text-white px-5 py-3 rounded-lg font-bold w-full transition duration-300">
+                    إضافة المنتج
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ********* نوافذ الذكاء الاصطناعي (بدون تغيير) ********* -->
+    <div id="ai-modal-desc" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden transition-colors duration-300" style="max-height: 90vh;">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gemini-blue flex items-center">
+                    <span class="ml-2">✨</span> مُحسّن وصف المنتج
+                </h3>
+                <button onclick="document.getElementById('ai-modal-desc').classList.add('hidden')" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <p class="text-gray-600 dark:text-gray-300 mb-4">أدخل بعض الكلمات المفتاحية أو النقاط الأساسية عن المنتج وسيقوم الذكاء الاصطناعي بإنشاء وصف تسويقي احترافي باللغة العربية.</p>
+                
+                <textarea id="ai-input-desc" rows="4" placeholder="مثال: قميص كتان. لون أزرق سماوي. مناسب للشاطئ. خفيف وبارد. السعر 65 دولاراً." class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-primary-indigo focus:border-primary-indigo mb-4"></textarea>
+                
+                <button id="generate-desc-btn" onclick="window.handleGenerateDescription()" class="gemini-feature-btn text-white px-5 py-3 rounded-lg font-bold w-full transition duration-300 flex items-center justify-center">
+                    <svg id="spinner-desc" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    توليد الوصف الآن
+                </button>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <h4 class="text-lg font-semibold mb-2 text-primary-dark dark:text-gray-100">الوصف المُولّد:</h4>
+                    <div id="ai-output-desc" class="bg-light-bg dark:bg-gray-700 p-4 rounded-lg min-h-[100px] text-gray-700 dark:text-gray-200 whitespace-pre-wrap">
+                        (سيظهر الوصف الاحترافي هنا...)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="faq-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden transition-colors duration-300" style="max-height: 90vh;">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gemini-blue flex items-center">
+                    <span class="ml-2">🗣️</span> مولد الأسئلة الشائعة للمنتج
+                </h3>
+                <button onclick="document.getElementById('faq-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <p class="text-gray-600 dark:text-gray-300 mb-4">أدخل اسم المنتج وبعض خصائصه (مثل المادة أو كيفية الغسيل) لإنشاء سؤال وجواب مفيد لصفحة الأسئلة الشائعة.</p>
+                
+                <textarea id="ai-input-faq" rows="3" placeholder="مثال: سترة كشمير فاخرة. مصنوعة من الكشمير الأصلي بنسبة 100%. ينصح بالغسيل الجاف فقط." class="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-primary-indigo focus:border-primary-indigo mb-4"></textarea>
+                
+                <button id="generate-faq-btn" onclick="window.handleGenerateFAQ()" class="gemini-feature-btn text-white px-5 py-3 rounded-lg font-bold w-full transition duration-300 flex items-center justify-center">
+                    <svg id="spinner-faq" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    توليد السؤال والجواب
+                </button>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <h4 class="text-lg font-semibold mb-2 text-primary-dark dark:text-gray-100">السؤال والجواب المُولّد:</h4>
+                    <div id="ai-output-faq" class="bg-light-bg dark:bg-gray-700 p-4 rounded-lg min-h-[100px] text-gray-700 dark:text-gray-200 whitespace-pre-wrap">
+                        (سيظهر السؤال والجواب هنا...)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // ********* إعداد Firebase *********
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, setLogLevel, 
+            collection, addDoc, onSnapshot, query, doc, setDoc, updateDoc, deleteDoc, getDoc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // متغيرات Firebase Global
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth, userId = null;
+        let isAuthReady = false; 
+        let userCart = []; // مصفوفة لتخزين عناصر السلة محلياً
+        let ADMIN_ID = null; // المعرف الخاص بك كمدير المتجر
+
+        // تهيئة Firebase
+        if (Object.keys(firebaseConfig).length > 0) {
+            setLogLevel('debug');
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            
+            // إدارة حالة المصادقة
+            onAuthStateChanged(auth, async (user) => {
+                const userStatusElement = document.getElementById('user-status');
+                
+                if (user) {
+                    userId = user.uid;
+                } else {
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                        userId = auth.currentUser?.uid || crypto.randomUUID();
+                    } catch (error) {
+                        console.error("Firebase Auth Error:", error);
+                        userStatusElement.textContent = 'خطأ في المصادقة';
+                    }
+                }
+                
+                // *** المنطق الجديد لتحديد المدير ***
+                // إذا كان ADMIN_ID لا يزال فارغاً (أي هذا أول مستخدم يفتح التطبيق)، فاجعله هو المدير
+                if (!ADMIN_ID) {
+                    ADMIN_ID = userId;
+                }
+                // **********************************
+
+                isAuthReady = true; 
+                userStatusElement.textContent = `مُعرّف المستخدم: ${userId.substring(0, 4)}...`;
+                
+                // تحقق من صلاحيات المدير وأظهر الزر إذا كان هو المدير
+                checkAdminAccess();
+                
+                // بمجرد أن تكون المصادقة جاهزة، ابدأ بتحميل المنتجات والسلة
+                loadProducts(); 
+                subscribeToCart(); 
+            });
+        }
+        
+        // دالة جديدة للتحقق من صلاحيات المدير
+        function checkAdminAccess() {
+            const adminButton = document.getElementById('admin-button');
+            if (userId && userId === ADMIN_ID) {
+                // المستخدم الحالي هو المدير، أظهر الزر
+                adminButton.classList.remove('hidden');
+                console.log("Admin privileges granted.");
+            } else {
+                // إخفاء الزر للتأكد (وهو مخفي افتراضياً في HTML)
+                adminButton.classList.add('hidden');
+            }
+        }
+
+
+        // ********* وظائف سلة التسوق (Cart Functions) *********
+
+        // دالة ترجع مسار سلة المستخدم
+        function getCartCollectionRef() {
+             if (!userId) {
+                console.error("User ID is not defined for cart operation.");
+                return null;
+            }
+            // المسار الخاص لكل مستخدم: /artifacts/{appId}/users/{userId}/cart
+            return collection(db, `artifacts/${appId}/users/${userId}/cart`);
+        }
+
+        // دالة تشترك في تغييرات سلة التسوق في الوقت الفعلي
+        function subscribeToCart() {
+            if (!isAuthReady || !db || !userId) return;
+
+            const cartRef = getCartCollectionRef();
+            if (!cartRef) return;
+            
+            const cartCountElement = document.getElementById('cart-count');
+
+            onSnapshot(query(cartRef), (snapshot) => {
+                userCart = [];
+                snapshot.forEach(doc => {
+                    userCart.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // تحديث عداد السلة في شريط التنقل
+                // تحقق من وجود العنصر قبل التحديث
+                if(cartCountElement) {
+                    cartCountElement.textContent = userCart.length;
+                }
+
+                // تحديث واجهة نافذة السلة (Modal)
+                renderCartModal(); 
+            }, (error) => {
+                console.error("Error subscribing to cart:", error);
+            });
+        }
+
+        // دالة لعرض محتويات السلة في النافذة المنبثقة
+        function renderCartModal() {
+            const listElement = document.getElementById('cart-items-list');
+            const totalElement = document.getElementById('cart-total');
+            const emptyMessage = document.getElementById('empty-cart-message');
+            
+            // *** FIX: إضافة تحقق للتأكد من أن العناصر محملة في DOM قبل محاولة التفاعل معها ***
+            if (!listElement || !totalElement || !emptyMessage) {
+                console.warn("Cart elements not yet available in DOM. Skipping render.");
+                return; 
+            }
+            // *** نهاية الإصلاح ***
+
+            if (userCart.length === 0) {
+                listElement.innerHTML = '';
+                emptyMessage.classList.remove('hidden');
+                totalElement.textContent = '$0.00';
+                return;
+            }
+            
+            emptyMessage.classList.add('hidden');
+            let total = 0;
+            let cartHtml = '';
+
+            userCart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                cartHtml += `
+                    <div class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
+                        <div class="flex items-center space-x-4 space-x-reverse">
+                            <img src="${item.imageUrl}" class="w-16 h-16 object-cover rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/100x100/e0e7ff/374151?text=منتج';" alt="${item.name}">
+                            <div>
+                                <h4 class="font-semibold text-primary-indigo">${item.name}</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">السعر: <span class="flex-row-reverse-on-rtl">$${item.price.toFixed(2)}</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 space-x-reverse">
+                            <!-- التحكم في الكمية -->
+                            <div class="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg p-1">
+                                <button onclick="window.updateCartItem('${item.id}', ${item.quantity - 1})" 
+                                        class="text-gray-600 dark:text-gray-300 hover:text-red-500 p-1" ${item.quantity <= 1 ? 'disabled' : ''}>
+                                    -
+                                </button>
+                                <span class="mx-2 font-medium">${item.quantity}</span>
+                                <button onclick="window.updateCartItem('${item.id}', ${item.quantity + 1})" 
+                                        class="text-gray-600 dark:text-gray-300 hover:text-green-500 p-1">
+                                    +
+                                </button>
+                            </div>
+                            
+                            <!-- إجمالي السعر للقطعة -->
+                            <span class="font-bold flex-row-reverse-on-rtl">${itemTotal.toFixed(2)}$</span>
+                            
+                            <!-- زر الحذف -->
+                            <button onclick="window.removeCartItem('${item.id}')" class="text-red-500 hover:text-red-700 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.892A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.108L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m-5 0h14"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listElement.innerHTML = cartHtml;
+            totalElement.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // دالة لإضافة منتج جديد أو زيادة كميته
+        async function addToCart(productId, name, price, imageUrl) {
+            if (!isAuthReady || !db || !userId) {
+                showCustomAlert("خطأ: يرجى الانتظار حتى تكتمل المصادقة.", 'error');
+                return;
+            }
+            
+            // نستخدم ID المنتج نفسه كمعرّف للوثيقة داخل سلة التسوق
+            const cartItemDocRef = doc(db, `artifacts/${appId}/users/${userId}/cart`, productId);
+            
+            try {
+                const itemSnapshot = await getDoc(cartItemDocRef);
+
+                if (itemSnapshot.exists()) {
+                    // المنتج موجود بالفعل: قم بزيادة الكمية
+                    await updateDoc(cartItemDocRef, {
+                        quantity: itemSnapshot.data().quantity + 1,
+                        timestamp: Date.now()
+                    });
+                    showCustomAlert(`تمت زيادة كمية ${name} في السلة!`, 'success');
+                } else {
+                    // المنتج غير موجود: قم بإضافته
+                    await setDoc(cartItemDocRef, {
+                        productId: productId,
+                        name: name,
+                        price: price,
+                        imageUrl: imageUrl,
+                        quantity: 1,
+                        timestamp: Date.now()
+                    });
+                    showCustomAlert(`تمت إضافة ${name} إلى السلة!`, 'success');
+                }
+            } catch (error) {
+                console.error("Error adding/updating cart item: ", error);
+                showCustomAlert("فشل إضافة المنتج إلى السلة.", 'error');
+            }
+        }
+        window.addToCart = addToCart;
+
+        // دالة لتعديل كمية منتج موجود
+        async function updateCartItem(itemId, newQuantity) {
+            if (!isAuthReady || !db || !userId) return;
+
+            const cartItemDocRef = doc(db, `artifacts/${appId}/users/${userId}/cart`, itemId);
+            
+            if (newQuantity <= 0) {
+                // إذا أصبحت الكمية صفر أو أقل، احذف المنتج
+                await removeCartItem(itemId);
+                return;
+            }
+
+            try {
+                await updateDoc(cartItemDocRef, {
+                    quantity: newQuantity
+                });
+            } catch (error) {
+                console.error("Error updating cart quantity: ", error);
+                showCustomAlert("فشل تعديل الكمية.", 'error');
+            }
+        }
+        window.updateCartItem = updateCartItem;
+
+        // دالة لحذف منتج من السلة
+        async function removeCartItem(itemId) {
+            if (!isAuthReady || !db || !userId) return;
+            
+            const cartItemDocRef = doc(db, `artifacts/${appId}/users/${userId}/cart`, itemId);
+            try {
+                await deleteDoc(cartItemDocRef);
+                showCustomAlert("تم حذف المنتج من السلة.", 'error');
+            } catch (error) {
+                console.error("Error removing cart item: ", error);
+                showCustomAlert("فشل حذف المنتج.", 'error');
+            }
+        }
+        window.removeCartItem = removeCartItem;
+
+        // دالة لفتح نافذة السلة (Cart Modal)
+        function showCartModal() {
+            if (!isAuthReady) {
+                showCustomAlert("يرجى الانتظار حتى يتم إعداد النظام...", 'info');
+                return;
+            }
+            document.getElementById('cart-modal').classList.remove('hidden');
+        }
+        window.showCartModal = showCartModal;
+
+
+        // ********* وظائف إدارة المنتجات (Admin Functions) *********
+        
+        // دالة لعرض منتج واحد في بطاقة
+        function renderProductCard(product) {
+            // نستخدم product.id كمعرف فريد للربط بين المنتج والسلة
+            const productId = product.id; 
+            // تحديد ما إذا كان المستخدم الحالي هو المدير لعرض خيارات التحرير/الحذف
+            const isAdmin = userId && userId === ADMIN_ID; 
+
+            return `
+                <div class="bg-light-bg dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden product-card-hover">
+                    <img src="${product.imageUrl}" onerror="this.onerror=null;this.src='https://placehold.co/600x800/e0e7ff/374151?text=صورة+غير+متاحة';" alt="${product.name}" class="w-full h-72 object-cover">
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold mb-1 truncate text-primary-dark dark:text-gray-100">${product.name}</h3>
+                        <p class="text-gray-500 dark:text-gray-400 mb-3">${product.description.substring(0, 50)}${product.description.length > 50 ? '...' : ''}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-primary-indigo flex-row-reverse-on-rtl">$${product.price.toFixed(2)}</span>
+                            <button onclick="window.addToCart('${productId}', '${product.name}', ${product.price}, '${product.imageUrl}')" class="bg-primary-indigo text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition duration-150">أضف إلى السلة</button>
+                        </div>
+                        ${isAdmin ? `
+                            <div class="mt-3 flex justify-end">
+                                <button onclick="window.deleteProduct('${productId}', '${product.name}')" class="text-red-500 hover:text-red-700 text-sm font-medium transition">حذف</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // دالة حذف المنتج (وظيفة جديدة للمدير)
+        async function deleteProduct(productId, productName) {
+            if (userId !== ADMIN_ID) {
+                showCustomAlert("لا تملك صلاحيات لحذف هذا المنتج.", 'error');
+                return;
+            }
+
+            // لا نستخدم window.confirm()، بل نكتفي بتنبيه مرئي
+            showCustomAlert(`تم حذف المنتج: ${productName}.`, 'error');
+
+            try {
+                const productDocRef = doc(db, `artifacts/${appId}/public/data/products`, productId);
+                await deleteDoc(productDocRef);
+            } catch (error) {
+                console.error("Error deleting product: ", error);
+                showCustomAlert("فشل حذف المنتج من قاعدة البيانات.", 'error');
+            }
+        }
+        window.deleteProduct = deleteProduct;
+        
+        // دالة تحميل وعرض المنتجات من Firestore (Real-time)
+        function loadProducts() {
+            if (!isAuthReady || !db) return; 
+
+            const productsRef = collection(db, `artifacts/${appId}/public/data/products`);
+            const productsGrid = document.getElementById('products-grid');
+            const loadingElement = document.getElementById('loading-products');
+
+            // استخدام onSnapshot للاستماع للتغييرات في الوقت الفعلي
+            onSnapshot(query(productsRef), (snapshot) => {
+                let productsHtml = '';
+                const products = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    products.push({ id: doc.id, ...data });
+                });
+
+                if (products.length === 0) {
+                    productsHtml = '<p class="col-span-full text-center text-gray-500 dark:text-gray-400">لم يتم إضافة أي منتجات بعد. استخدم لوحة الإدارة لإضافة منتجك الأول!</p>';
+                } else {
+                    products.forEach(product => {
+                        productsHtml += renderProductCard(product);
+                    });
+                }
+                
+                // تحقق من وجود العناصر قبل التحديث
+                if (productsGrid && loadingElement) {
+                    productsGrid.innerHTML = productsHtml;
+                    loadingElement.style.display = 'none'; // إخفاء رسالة التحميل
+                }
+                
+            }, (error) => {
+                console.error("Error loading products:", error);
+                if (productsGrid && loadingElement) {
+                    productsGrid.innerHTML = '<p class="col-span-full text-center text-red-500">حدث خطأ أثناء تحميل المنتجات.</p>';
+                    loadingElement.style.display = 'none';
+                }
+            });
+        }
+        
+        // دالة إضافة منتج جديد (من لوحة الإدارة)
+        const addProductForm = document.getElementById('add-product-form');
+        if(addProductForm) {
+            addProductForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!db || !userId || userId !== ADMIN_ID) {
+                    showCustomAlert("خطأ: لا تملك صلاحيات المدير لإضافة منتجات.", 'error');
+                    return;
+                }
+
+                const name = document.getElementById('product-name').value;
+                const price = parseFloat(document.getElementById('product-price').value);
+                const description = document.getElementById('product-desc').value;
+                const imageUrl = document.getElementById('product-image').value;
+
+                if (isNaN(price) || price <= 0) {
+                    showCustomAlert("الرجاء إدخال سعر صحيح.", 'error');
+                    return;
+                }
+
+                const newProduct = {
+                    name: name,
+                    price: price,
+                    description: description,
+                    imageUrl: imageUrl,
+                    timestamp: Date.now()
+                };
+                
+                const button = document.getElementById('submit-product-btn');
+                const originalText = button.textContent;
+                button.textContent = 'جاري الحفظ...';
+                button.disabled = true;
+
+                try {
+                    // إضافة المنتج في مسار المنتجات العام
+                    const productsRef = collection(db, `artifacts/${appId}/public/data/products`);
+                    await addDoc(productsRef, newProduct);
+                    
+                    showCustomAlert(`تمت إضافة المنتج "${name}" بنجاح!`, 'success');
+                    addProductForm.reset();
+                    document.getElementById('admin-modal').classList.add('hidden'); // إغلاق النافذة
+                } catch (error) {
+                    console.error("Error adding product: ", error);
+                    showCustomAlert("فشل إضافة المنتج. تحقق من سجل الأخطاء.", 'error');
+                } finally {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            });
+        }
+
+
+        // ********* وظائف واجهة المستخدم والوضع المظلم *********
+
+        // الوضع المظلم
+        const toggle = document.getElementById('dark-mode-toggle');
+        const html = document.documentElement;
+        const THEME_KEY = 'user-theme';
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                if(toggle) toggle.checked = true; // تحقق إضافي
+            } else {
+                html.classList.remove('dark');
+                if(toggle) toggle.checked = false; // تحقق إضافي
+            }
+        }
+
+        function loadInitialTheme() {
+            const savedTheme = localStorage.getItem(THEME_KEY);
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        }
+
+        if(toggle) {
+            toggle.addEventListener('change', () => {
+                if (toggle.checked) {
+                    applyTheme('dark');
+                    localStorage.setItem(THEME_KEY, 'dark');
+                } else {
+                    applyTheme('light');
+                    localStorage.setItem(THEME_KEY, 'light');
+                }
+            });
+        }
+
+        window.addEventListener('load', loadInitialTheme);
+
+
+        // القائمة المتنقلة (Mobile Menu Logic)
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIconOpen = document.getElementById('menu-icon-open');
+        const menuIconClose = document.getElementById('menu-icon-close');
+
+        if(mobileMenuButton && mobileMenu && menuIconOpen && menuIconClose) {
+            mobileMenuButton.addEventListener('click', () => {
+                const isMenuOpen = mobileMenu.classList.toggle('hidden');
+                if (isMenuOpen) {
+                    menuIconOpen.classList.remove('hidden');
+                    menuIconClose.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                } else {
+                    menuIconOpen.classList.add('hidden');
+                    menuIconClose.classList.remove('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            mobileMenu.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    menuIconOpen.classList.remove('hidden');
+                    menuIconClose.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                });
+            });
+        }
+
+
+        // وظيفة التنبيهات المخصصة
+        function showCustomAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `p-4 rounded-lg shadow-xl text-sm max-w-sm w-full transition-all duration-300 transform translate-x-0 opacity-100`;
+
+            let bgColor, icon;
+            if (type === 'success') {
+                bgColor = 'bg-green-500';
+                icon = '<svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            } else if (type === 'error') {
+                bgColor = 'bg-red-600';
+                icon = '<svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            } else {
+                bgColor = 'bg-primary-dark';
+                icon = '<svg class="w-5 h-5 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.2 4.3M12 4v16m-4-8h8"></path></svg>';
+            }
+
+            const alertContainer = document.getElementById('alert-container');
+            if (!alertContainer) return; // تأكد من وجود حاوية التنبيهات
+
+            alertDiv.innerHTML = `
+                <div class="flex items-center text-white ${bgColor} p-3 rounded-lg">
+                    ${icon}
+                    <span>${message}</span>
+                </div>
+            `;
+
+            alertContainer.prepend(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.classList.add('opacity-0', '-translate-x-full'); 
+                setTimeout(() => {
+                    alertContainer.removeChild(alertDiv);
+                }, 300);
+            }, 3000);
+        }
+        window.showCustomAlert = showCustomAlert;
+
+        // ********* وظائف API للذكاء الاصطناعي (Gemini) *********
+        
+        async function callGeminiApiWithBackoff(payload, maxRetries = 5) {
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429 && attempt < maxRetries - 1) {
+                        const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue; 
+                    }
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`API Error ${response.status}: ${errorData.error.message}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+
+                } catch (error) {
+                    console.error("API Call failed:", error);
+                    if (attempt === maxRetries - 1) {
+                        throw new Error(`فشل الاتصال بـ Gemini AI بعد ${maxRetries} محاولات.`);
+                    }
+                    const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        async function handleGenerateDescription() {
+            const inputElement = document.getElementById('ai-input-desc');
+            const outputElement = document.getElementById('ai-output-desc');
+            const buttonElement = document.getElementById('generate-desc-btn');
+            const spinnerElement = document.getElementById('spinner-desc');
+
+            if (!inputElement || !outputElement || !buttonElement || !spinnerElement) {
+                showCustomAlert("خطأ في تهيئة عناصر واجهة المستخدم الخاصة بالذكاء الاصطناعي.", 'error');
+                return;
+            }
+
+            const userDraft = inputElement.value.trim();
+
+            if (userDraft.length < 10) {
+                showCustomAlert("الرجاء إدخال المزيد من التفاصيل (10 أحرف على الأقل) لوصف المنتج.", 'error');
+                return;
+            }
+
+            buttonElement.disabled = true;
+            spinnerElement.classList.remove('hidden');
+            outputElement.textContent = "جاري توليد الوصف... يرجى الانتظار.";
+            
+            const systemPrompt = "أنت خبير تسويق إلكتروني وتخصصك كتابة أوصاف منتجات ملابس احترافية وجذابة باللغة العربية الفصحى. يجب أن يكون الوصف مقنعًا، منظمًا جيدًا (باستخدام الفقرات)، ومناسبًا لمتجر ملابس راقٍ.";
+            
+            const userQuery = `حول هذه النقاط الأساسية أو المسودة إلى وصف منتج نهائي، يرجى كتابة وصف واحد فقط في فقرة واحدة طويلة ومقنعة: ${userDraft}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const result = await callGeminiApiWithBackoff(payload);
+                const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text || "لم يتم توليد وصف، الرجاء المحاولة مرة أخرى.";
+
+                outputElement.textContent = generatedText;
+                showCustomAlert("تم توليد الوصف بنجاح!", 'success');
+            } catch (error) {
+                outputElement.textContent = `حدث خطأ: ${error.message}`;
+                showCustomAlert("فشل التوليد. تحقق من الاتصال.", 'error');
+            } finally {
+                buttonElement.disabled = false;
+                spinnerElement.classList.add('hidden');
+            }
+        }
+        window.handleGenerateDescription = handleGenerateDescription;
+
+        async function handleGenerateFAQ() {
+            const inputElement = document.getElementById('ai-input-faq');
+            const outputElement = document.getElementById('ai-output-faq');
+            const buttonElement = document.getElementById('generate-faq-btn');
+            const spinnerElement = document.getElementById('spinner-faq');
+            
+            if (!inputElement || !outputElement || !buttonElement || !spinnerElement) {
+                showCustomAlert("خطأ في تهيئة عناصر واجهة المستخدم الخاصة بالأسئلة الشائعة.", 'error');
+                return;
+            }
+
+            const userDraft = inputElement.value.trim();
+
+            if (userDraft.length < 10) {
+                showCustomAlert("الرجاء إدخال المزيد من التفاصيل (10 أحرف على الأقل) لإنشاء السؤال والجواب.", 'error');
+                return;
+            }
+
+            buttonElement.disabled = true;
+            spinnerElement.classList.remove('hidden');
+            outputElement.textContent = "جاري توليد السؤال والجواب... يرجى الانتظار.";
+            
+            const systemPrompt = "أنت مساعد متخصص في خدمة العملاء. مهمتك هي قراءة وصف المنتج أو خصائصه وإنشاء سؤال واحد وجواب واحد محتملين ومفيدين للأسئلة الشائعة (FAQ) بناءً على هذه المعلومات. يجب أن يكون السؤال والجواب باللغة العربية الفصحى ومرتبطين بالموضوع مباشرة (مثل: العناية بالمنتج، الحجم، الشحن).";
+            
+            const userQuery = `هذه هي المعلومات الأساسية للمنتج: "${userDraft}". قم بتوليد سؤال واحد وجواب واحد، وقم بتنسيقهما كالتالي: السؤال: [سؤال مناسب] الجواب: [جواب دقيق ومختصر].`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const result = await callGeminiApiWithBackoff(payload);
+                const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text || "لم يتم توليد سؤال وجواب، الرجاء المحاولة مرة أخرى.";
+
+                outputElement.textContent = generatedText;
+                showCustomAlert("تم توليد السؤال والجواب بنجاح!", 'success');
+            } catch (error) {
+                outputElement.textContent = `حدث خطأ: ${error.message}`;
+                showCustomAlert("فشل التوليد. تحقق من الاتصال.", 'error');
+            } finally {
+                buttonElement.disabled = false;
+                spinnerElement.classList.add('hidden');
+            }
+        }
+        window.handleGenerateFAQ = handleGenerateFAQ;
+    </script>
+</body>
+</html>
